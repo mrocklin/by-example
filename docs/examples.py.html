@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>Setup</title>
+  <title>Install</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -21,7 +21,7 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h1 id="setup">Setup</h1>
+              <h1 id="install">Install</h1>
 
             </div>
             
@@ -34,12 +34,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>We set up a center on one node</p>
+              <p>The best way to get distributed is to point <code>pip</code> to the github repository</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>$ dcenter
-Start center at <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">8787</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>pip install https://github.com/blaze/distributed.git --upgrade</pre></div></div>
             
         </li>
         
@@ -49,6 +48,35 @@ Start center at <span class="hljs-number">127.0</span><span class="hljs-number">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <h1 id="setup">Setup</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>We set up a center on one node</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>$ dcenter     <span class="hljs-comment"># We use the below address to refer to the cluster</span>
+Start center at <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">8787</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
               <p>And set up workers on other processes or computers that point to this address</p>
 <p>For simplicity we used localhost here (<code>127.0.0.1</code>) but we could have used
@@ -67,42 +95,13 @@ Registered <span class="hljs-keyword">with</span> center at:  <span class="hljs-
         </li>
         
         
-        <li id="section-4">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-4">&#182;</a>
-              </div>
-              <h1 id="executor">Executor</h1>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-5">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
-              </div>
-              <p>We connect an executor to the center node of our cluster</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">from</span> distributed <span class="hljs-keyword">import</span> Executor
-e = Executor(<span class="hljs-string">'127.0.0.1:8787'</span>)</pre></div></div>
-            
-        </li>
-        
-        
         <li id="section-6">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <h1 id="submit-and-result">Submit and Result</h1>
+              <h1 id="executor">Executor</h1>
 
             </div>
             
@@ -115,14 +114,12 @@ e = Executor(<span class="hljs-string">'127.0.0.1:8787'</span>)</pre></div></div
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>We submit a function for remote execution and receive a future.</p>
+              <p>Connect an executor to the center node of the cluster</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">inc</span><span class="hljs-params">(x)</span>:</span>
-    <span class="hljs-keyword">return</span> x + <span class="hljs-number">1</span>
-
-<span class="hljs-meta">&gt;&gt;&gt; </span>future = e.submit(inc, <span class="hljs-number">1</span>)  <span class="hljs-comment"># calls inc(1) on a worker</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">from</span> distributed <span class="hljs-keyword">import</span> Executor
+e = Executor(<span class="hljs-string">'127.0.0.1:8787'</span>)</pre></div></div>
             
         </li>
         
@@ -133,13 +130,9 @@ e = Executor(<span class="hljs-string">'127.0.0.1:8787'</span>)</pre></div></div
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p>The future isn’t the actual result (2).  It points to that result on a remote
-worker.</p>
+              <h1 id="submit-and-result">Submit and Result</h1>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>future
-&lt;Future: status: finished, key: inc<span class="hljs-number">-79963</span>f7e613e5e55838d2232920baed2&gt;</pre></div></div>
             
         </li>
         
@@ -150,13 +143,16 @@ worker.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <p>We collect the remote result from the remote worker to the local process by
-calling <code>result()</code></p>
+              <p>Submit a function for remote execution and receive a future.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>future.result()  <span class="hljs-comment"># collect result from remote worker</span>
-<span class="hljs-number">2</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">inc</span><span class="hljs-params">(x)</span>:</span>
+    <span class="hljs-keyword">return</span> x + <span class="hljs-number">1</span>
+
+<span class="hljs-meta">&gt;&gt;&gt; </span>future = e.submit(inc, <span class="hljs-number">1</span>)  <span class="hljs-comment"># calls inc(1) on a worker</span>
+<span class="hljs-meta">&gt;&gt;&gt; </span>future
+&lt;Future: status: finished, key: inc<span class="hljs-number">-79963</span>f7e613e5e55838d2232920baed2&gt;</pre></div></div>
             
         </li>
         
@@ -167,9 +163,15 @@ calling <code>result()</code></p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <h1 id="map-and-gather">map and gather</h1>
+              <p>The future doesn’t hold the actual result.  It points to the result on a remote
+worker.</p>
+<p>Collect the remote result from the remote worker to the local process by
+calling the <code>.result()</code> method on the future.</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>future.result()  <span class="hljs-comment"># collect result from remote worker</span>
+<span class="hljs-number">2</span></pre></div></div>
             
         </li>
         
@@ -180,7 +182,20 @@ calling <code>result()</code></p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <p>We apply the same function to many inputs with map</p>
+              <h1 id="map-and-gather">map and gather</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Apply the same function to many inputs with <code>map</code></p>
 
             </div>
             
@@ -195,13 +210,14 @@ calling <code>result()</code></p>
         </li>
         
         
-        <li id="section-12">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <p>We collect all of the results with a single call to gather</p>
+              <p>Collect all of the results with a single call to the <code>gather()</code> method on the
+<code>Executor</code></p>
 
             </div>
             
@@ -211,24 +227,26 @@ calling <code>result()</code></p>
         </li>
         
         
-        <li id="section-13">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <h1 id="submit-and-map-on-futures">Submit and map on futures</h1>
+              <p><code>Future.result</code> and <code>Executor.gather</code> are a bit redundant.  Generally
+<code>Executor.gather</code> is more efficient.</p>
+<h1 id="submit-and-map-on-futures">Submit and map on futures</h1>
 
             </div>
             
         </li>
         
         
-        <li id="section-14">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>We <code>submit</code> and <code>map</code> functions directly onto futures.</p>
 <p>We don’t need to collect the intermediate result, <code>future</code>, to the local
@@ -249,30 +267,14 @@ future2 = e.submit(double, future)</pre></div></div>
         </li>
         
         
-        <li id="section-15">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
-              </div>
-              <p>You should avoid data-movement operations like <code>future.result()</code> or <code>e.gather()</code> when possible</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-comment"># future.result()  # no need to move the intermediate result</span></pre></div></div>
-            
-        </li>
-        
-        
         <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <p>We make sure to move the function to the worker node that already has the data
-for the input.  This minimizes communication within the network.</p>
-<h1 id="submit-and-map-with-many-inputs">Submit and map with many inputs</h1>
+              <p>You should avoid data-movement operations like <code>future.result()</code> or <code>e.gather()</code> when possible</p>
+<p>future.result()  # avoid expensive calls to result/gather if unnecessary</p>
 
             </div>
             
@@ -285,12 +287,11 @@ for the input.  This minimizes communication within the network.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
-              <p>Submit and map can take multiple inputs:</p>
+              <p>We move the function to the worker node that already has the data for the
+input.  This minimizes communication within the network.</p>
+<h1 id="submit-and-map-with-many-inputs">Submit and map with many inputs</h1>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>e.submit(function, *args, **kwargs)
-<span class="hljs-meta">&gt;&gt;&gt; </span>e.map(function, *iterables, **kwargs)</pre></div></div>
             
         </li>
         
@@ -301,14 +302,12 @@ for the input.  This minimizes communication within the network.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p>This includes taking in multiple futures</p>
+              <p>Submit and map can consume multiple inputs and keyword arguments</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>futures = e.map(double, range(<span class="hljs-number">10</span>))
-<span class="hljs-meta">&gt;&gt;&gt; </span>total = e.submit(sum, futures)   <span class="hljs-comment"># call sum on a list of futures</span>
-<span class="hljs-meta">&gt;&gt;&gt; </span>total.result()
-<span class="hljs-number">90</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>e.submit(function, *args, **kwargs)
+<span class="hljs-meta">&gt;&gt;&gt; </span>e.map(function, *iterables, **kwargs)</pre></div></div>
             
         </li>
         
@@ -319,12 +318,15 @@ for the input.  This minimizes communication within the network.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <p>If the remote data inputs live on different worker nodes then we move all of
-the data to a single node to run the function.  Generally we run the
-computation on the node that has most of the bytes of the input data.</p>
-<h1 id="scatter">Scatter</h1>
+              <p>This includes consuming multiple futures</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>futures = e.map(double, range(<span class="hljs-number">10</span>))
+
+<span class="hljs-meta">&gt;&gt;&gt; </span>total = e.submit(sum, futures)   <span class="hljs-comment"># call sum on a list of futures</span>
+<span class="hljs-meta">&gt;&gt;&gt; </span>total.result()
+<span class="hljs-number">90</span></pre></div></div>
             
         </li>
         
@@ -335,7 +337,23 @@ computation on the node that has most of the bytes of the input data.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
-              <p>We send local data to the network with the <code>scatter</code> function.</p>
+              <p>If the remote inputs live on different worker nodes then we move all of the
+necessary data to a single node where we run the function.  Generally we run
+choose the node that would require the least communication of bytes.</p>
+<h1 id="scatter">Scatter</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>Send local data to the network with the <code>scatter</code> function.</p>
 
             </div>
             
@@ -347,14 +365,14 @@ computation on the node that has most of the bytes of the input data.</p>
         </li>
         
         
-        <li id="section-21">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
-              <p>This is particularly common when we have data on our local disk that we want to
-load and then send up to the network</p>
+              <p>This is common when we have data on our local disk that we want to load and
+then upload to the network</p>
 
             </div>
             
@@ -369,14 +387,14 @@ load and then send up to the network</p>
         </li>
         
         
-        <li id="section-22">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>But its best to use the workers themselves to load the data if the data is
-globally available (such as on a network file system).</p>
+globally available (such as on a network file system or S3).</p>
 
             </div>
             
