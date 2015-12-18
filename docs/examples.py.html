@@ -62,11 +62,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>We set up a center on one node</p>
+              <p>Set up a center on one node</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>$ dcenter     <span class="hljs-comment"># We use the below address to refer to the cluster</span>
+            <div class="content"><div class='highlight'><pre>$ dcenter     <span class="hljs-comment"># Use the below address to refer to the cluster</span>
 Start center at <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">8787</span></pre></div></div>
             
         </li>
@@ -78,9 +78,10 @@ Start center at <span class="hljs-number">127.0</span><span class="hljs-number">
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p>And set up workers on other processes or computers that point to this address</p>
+              <p>Set up workers on other processes or computers that point to this address</p>
 <p>For simplicity we used localhost here (<code>127.0.0.1</code>) but we could have used
 other machines and real addresses if desired.</p>
+<p><code>distributed</code> communicates over TCP sockets.</p>
 
             </div>
             
@@ -89,7 +90,7 @@ Start worker at             <span class="hljs-number">127.0</span><span class="h
 Registered <span class="hljs-keyword">with</span> center at:  <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">8787</span>
 
 $ dworker <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">8787</span>
-Start worker at             <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">46990</span>
+Start worker at             <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">38618</span>
 Registered <span class="hljs-keyword">with</span> center at:  <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">8787</span></pre></div></div>
             
         </li>
@@ -130,7 +131,7 @@ e = Executor(<span class="hljs-string">'127.0.0.1:8787'</span>)</pre></div></div
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <h1 id="submit-and-result">Submit and Result</h1>
+              <h1 id="submit-and-gather">Submit and Gather</h1>
 
             </div>
             
@@ -144,6 +145,8 @@ e = Executor(<span class="hljs-string">'127.0.0.1:8787'</span>)</pre></div></div
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p>Submit a function for remote execution and receive a future.</p>
+<p>The future doesn’t hold the actual result.  It stores a location on a remote
+worker where the actual result currently lives.</p>
 
             </div>
             
@@ -163,15 +166,15 @@ e = Executor(<span class="hljs-string">'127.0.0.1:8787'</span>)</pre></div></div
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p>The future doesn’t hold the actual result.  It points to the result on a remote
-worker.</p>
-<p>Collect the remote result from the remote worker to the local process by
-calling the <code>.result()</code> method on the future.</p>
+              <p>Remote data stays remote until we gather it explicitly.  Collect the remote
+result from the remote worker to the local process with the calling the
+<code>e.gather()</code> method.  This expects a list of futures and returns a list of
+concrete results.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>future.result()  <span class="hljs-comment"># collect result from remote worker</span>
-<span class="hljs-number">2</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>e.gather([future])  <span class="hljs-comment"># collect result from remote worker</span>
+[<span class="hljs-number">2</span>]</pre></div></div>
             
         </li>
         
@@ -233,9 +236,7 @@ calling the <code>.result()</code> method on the future.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p><code>Future.result</code> and <code>Executor.gather</code> are a bit redundant.  Generally
-<code>Executor.gather</code> is more efficient.</p>
-<h1 id="submit-and-map-on-futures">Submit and map on futures</h1>
+              <h1 id="submit-and-map-on-futures">Submit and map on futures</h1>
 
             </div>
             
@@ -248,7 +249,7 @@ calling the <code>.result()</code> method on the future.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p>We <code>submit</code> and <code>map</code> functions directly onto futures.</p>
+              <p>Call <code>submit</code> and <code>map</code> functions directly onto futures.</p>
 <p>We don’t need to collect the intermediate result, <code>future</code>, to the local
 process.  This avoids sending large remote results across the network.  We move
 the function to the data rather than move the data to the function.</p>
@@ -261,8 +262,8 @@ the function to the data rather than move the data to the function.</p>
 <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">double</span><span class="hljs-params">(x)</span>:</span>
     <span class="hljs-keyword">return</span> <span class="hljs-number">2</span> * x
 
-future = e.submit(inc, <span class="hljs-number">1</span>)
-future2 = e.submit(double, future)</pre></div></div>
+future1 = e.submit(inc, <span class="hljs-number">1</span>)
+future2 = e.submit(double, future1)  <span class="hljs-comment"># use submit directly on future</span></pre></div></div>
             
         </li>
         
@@ -273,10 +274,11 @@ future2 = e.submit(double, future)</pre></div></div>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <p>You should avoid data-movement operations like <code>future.result()</code> or <code>e.gather()</code> when possible</p>
-<p>future.result()  # avoid expensive calls to result/gather if unnecessary</p>
+              <p>Avoid moving data with <code>e.gather</code> when possible</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>e.gather([future1])  <span class="hljs-comment"># BAD: avoid unnecessary gather calls</span></pre></div></div>
             
         </li>
         
@@ -319,14 +321,20 @@ input.  This minimizes communication within the network.</p>
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>This includes consuming multiple futures</p>
+<p>If the remote inputs live on different worker nodes then we move all of the
+necessary data to a single node where we run the function.  Generally we run
+choose the node that would require the least communication of bytes.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>futures = e.map(double, range(<span class="hljs-number">10</span>))
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">add</span><span class="hljs-params">(x, y)</span>:</span>
+    <span class="hljs-keyword">return</span> x + y
+
+<span class="hljs-meta">&gt;&gt;&gt; </span>futures = e.map(add, range(<span class="hljs-number">10</span>), range(<span class="hljs-number">10</span>))
 
 <span class="hljs-meta">&gt;&gt;&gt; </span>total = e.submit(sum, futures)   <span class="hljs-comment"># call sum on a list of futures</span>
-<span class="hljs-meta">&gt;&gt;&gt; </span>total.result()
-<span class="hljs-number">90</span></pre></div></div>
+<span class="hljs-meta">&gt;&gt;&gt; </span>e.gather([total])
+[<span class="hljs-number">90</span>]</pre></div></div>
             
         </li>
         
@@ -337,10 +345,7 @@ input.  This minimizes communication within the network.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
-              <p>If the remote inputs live on different worker nodes then we move all of the
-necessary data to a single node where we run the function.  Generally we run
-choose the node that would require the least communication of bytes.</p>
-<h1 id="scatter">Scatter</h1>
+              <h1 id="scatter">Scatter</h1>
 
             </div>
             
@@ -371,8 +376,8 @@ choose the node that would require the least communication of bytes.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
-              <p>This is common when we have data on our local disk that we want to load and
-then upload to the network</p>
+              <p>This is common when we have data on our local disk that we want to load locally
+and then upload to the network</p>
 
             </div>
             
@@ -400,6 +405,475 @@ globally available (such as on a network file system or S3).</p>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>filename_futures = e.scatter(filenames)
 <span class="hljs-meta">&gt;&gt;&gt; </span>futures = e.map(pd.read_csv, filename_futures, parse_dates=[<span class="hljs-string">'date'</span>])</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <h1 id="exceptions">Exceptions</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>We make mistakes; functions err.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">div</span><span class="hljs-params">(x, y)</span>:</span>
+    <span class="hljs-keyword">return</span> x / y
+
+<span class="hljs-meta">&gt;&gt;&gt; </span>future = e.submit(div, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>)  <span class="hljs-comment"># divides by zero</span>
+<span class="hljs-meta">&gt;&gt;&gt; </span>future
+&lt;Future: status: error, key: div<span class="hljs-number">-2149e07</span>b88c7cda532abb6304548ffec&gt;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>Check the status of a future with the <code>.status</code> field</p>
+<p>Excplicitly collect the exception and traceback</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>future.status
+<span class="hljs-string">'error'</span>
+
+<span class="hljs-meta">&gt;&gt;&gt; </span>future.exception()  <span class="hljs-comment"># collect exception from remote worker</span>
+ZeroDivisionError(<span class="hljs-string">'division by zero'</span>)
+
+<span class="hljs-meta">&gt;&gt;&gt; </span>future.traceback()  <span class="hljs-comment"># collect traceback from remote worker</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>Futures that depend on other futures also fail</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>future2 = e.submit(inc, future)  <span class="hljs-comment"># computations on failed futures fail</span>
+<span class="hljs-meta">&gt;&gt;&gt; </span>future2
+&lt;Future: status: error, key: inc<span class="hljs-number">-6e3</span>ab83dd1f6c214c21ce7df8353306d&gt;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>Gathering failed futures raises their exceptions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>e.gather([future])  <span class="hljs-comment"># gathering bad futures raise exceptions</span>
+---------------------------------------------------------------------------
+ZeroDivisionError                         Traceback (most recent call last)
+...
+ZeroDivisionError: division by zero</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <h1 id="restart">Restart</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>Remote computing gets messy.  Restart the network with the <code>restart</code> method.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>e.restart()
+distributed.scheduler - CRITICAL - Lost all workers
+distributed.scheduler - INFO - Worker failed <span class="hljs-keyword">from</span> closed stream: (<span class="hljs-string">'127.0.0.1'</span>, <span class="hljs-number">38618</span>)
+distributed.scheduler - INFO - Worker failed <span class="hljs-keyword">from</span> closed stream: (<span class="hljs-string">'127.0.0.1'</span>, <span class="hljs-number">32955</span>)
+distributed.executor - INFO - Receive restart signal <span class="hljs-keyword">from</span> scheduler</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p>This cancels all running computations, destroys all data, and sets the status
+of all previous futures to <code>cancelled</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>future
+&lt;Future: status: cancelled, key: div<span class="hljs-number">-2149e07</span>b88c7cda532abb6304548ffec&gt;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
+              </div>
+              <h1 id="wait-on-futures">Wait on futures</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-33">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <h3 id="wait">wait</h3>
+<p>Submit and map calls return immediately, even if the remote computations take a
+while.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">from</span> time <span class="hljs-keyword">import</span> sleep
+<span class="hljs-meta">&gt;&gt;&gt; </span>%time a, b, c = e.map(sleep, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>])  <span class="hljs-comment"># returns immediately</span>
+Wall time: <span class="hljs-number">829</span> µs</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-34">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-34">&#182;</a>
+              </div>
+              <p>Explicitly block on these futures with the wait command</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">from</span> distributed <span class="hljs-keyword">import</span> wait
+<span class="hljs-meta">&gt;&gt;&gt; </span>%time wait([a, b, c])
+Wall time: <span class="hljs-number">3.00</span> s</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-35">&#182;</a>
+              </div>
+              <h3 id="progress">progress</h3>
+<p>Block on all of the futures (like <code>wait</code>) but get visual feedback with
+<code>progress</code></p>
+<p>In the console <code>progress</code> provides a text progressbar as shown here.  In the
+notebook it provides a more enticing widget that returns asynchronously.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">from</span> distributed <span class="hljs-keyword">import</span> progress
+<span class="hljs-meta">&gt;&gt;&gt; </span>progress([a, b, c])
+[<span class="hljs-comment">########################################] | 100% Completed |  3.0s</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-36">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-36">&#182;</a>
+              </div>
+              <h3 id="as_completed">as_completed</h3>
+<p>We can also consume futures as they complete.  The <code>as_completed</code> function
+returns an iterator of futures.</p>
+<p>The results are ordered by time completed, not by the order of input.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">from</span> distributed <span class="hljs-keyword">import</span> as_completed
+<span class="hljs-meta">&gt;&gt;&gt; </span>seq = as_completed([a, b, c])
+<span class="hljs-meta">&gt;&gt;&gt; </span>next(seq)
+&lt;Future: status: finished, key: sleep-ce033b8d1e3927a69d8110154bb272eb&gt;
+<span class="hljs-meta">&gt;&gt;&gt; </span>next(seq)
+&lt;Future: status: finished, key: sleep<span class="hljs-number">-81</span>ed9178e93db3b0d45c06730d7079ff&gt;
+<span class="hljs-meta">&gt;&gt;&gt; </span>next(seq)
+&lt;Future: status: finished, key: sleep<span class="hljs-number">-308</span>f0c825431822d43330848333d0af6&gt;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-37">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-37">&#182;</a>
+              </div>
+              <h1 id="manage-memory">Manage Memory</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-38">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-38">&#182;</a>
+              </div>
+              <p>Distributed computations trigger immediately</p>
+<p>This can fill all of distributed our memory.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>futures1 = e.map(load, filenames)    <span class="hljs-comment"># starts to load all data immediately</span>
+<span class="hljs-meta">&gt;&gt;&gt; </span>futures2 = e.map(process, futures1)  <span class="hljs-comment"># intermediate results stay in RAM</span>
+<span class="hljs-meta">&gt;&gt;&gt; </span>futures3 = e.map(store, futures2)    <span class="hljs-comment"># even after they're not needed</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-39">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-39">&#182;</a>
+              </div>
+              <p>The scheduler holds on to all remote data for which there is an active future.
+So we can clear up space on our cluster by deleting futures for intermediate
+results.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">del</span> futures2</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-40">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-40">&#182;</a>
+              </div>
+              <h1 id="dask-collections">Dask collections</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-41">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-41">&#182;</a>
+              </div>
+              <p>Distributed plays nicely with <a href="http://dask.pydata.org/en/latest/">dask</a>
+collections, like
+<code>dask.</code><a href="http://dask.pydata.org/en/latest/array.html"><code>array</code></a>/<a href="http://dask.pydata.org/en/latest/array.html"><code>bag</code></a>/<a href="http://dask.pydata.org/en/latest/dataframe.html"><code>dataframe</code></a>/<a href="http://dask.pydata.org/en/latest/dataframe.html"><code>imperative</code></a>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>x = da.random.normal(loc=<span class="hljs-number">10</span>, scale=<span class="hljs-number">0.1</span>, size=(<span class="hljs-number">10000</span>, <span class="hljs-number">10000</span>),
+<span class="hljs-meta">... </span>                     chunks=(<span class="hljs-number">1000</span>, <span class="hljs-number">1000</span>))
+<span class="hljs-meta">&gt;&gt;&gt; </span>y = x.mean()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-42">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-42">&#182;</a>
+              </div>
+              <h3 id="get">get</h3>
+<p>Executors include a dask compatible <code>get</code> method that can be passed to a
+collection:</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>y.compute(get=e.get)
+<span class="hljs-number">9.9999898105974729</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-43">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-43">&#182;</a>
+              </div>
+              <p>Alternatively we can set this get function globally within dask</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">import</span> dask
+<span class="hljs-meta">&gt;&gt;&gt; </span>dask.set_options(get=e.get)
+<span class="hljs-meta">&gt;&gt;&gt; </span>y.compute()
+<span class="hljs-number">9.9999898105974729</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-44">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-44">&#182;</a>
+              </div>
+              <h3 id="compute">compute</h3>
+<p>The operations above are synchronous.  They block until complete.  Most of
+distributed is asynchronous, it returns futures immediately.  The
+Executor.compute method converts dask collections into futures.  It expects a
+list of collections and returns a list of futures</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>futures = e.compute(y)
+<span class="hljs-meta">&gt;&gt;&gt; </span>e.gather(futures)
+<span class="hljs-number">9.9999898105974729</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-45">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-45">&#182;</a>
+              </div>
+              <h1 id="dask-imperative">Dask Imperative</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-46">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-46">&#182;</a>
+              </div>
+              <p>Dask collections are lazy.  They don’t start right away.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">from</span> dask.imperative <span class="hljs-keyword">import</span> do
+<span class="hljs-meta">&gt;&gt;&gt; </span>values1 = [do(load)(filename) <span class="hljs-keyword">for</span> filename <span class="hljs-keyword">in</span> filenames]  <span class="hljs-comment"># lazy</span>
+<span class="hljs-meta">&gt;&gt;&gt; </span>values2 = [do(process)(val1) <span class="hljs-keyword">for</span> val1 <span class="hljs-keyword">in</span> values1]
+<span class="hljs-meta">&gt;&gt;&gt; </span>values3 = [do(store)(val2) <span class="hljs-keyword">for</span> val2 <span class="hljs-keyword">in</span> values2]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-47">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-47">&#182;</a>
+              </div>
+              <p>When we submit <code>values3</code> to the executor it’s clear that we don’t need
+<code>values1</code> and values2` to persist .  The distributed scheduler removes these
+intermediate results during computation, freeing up precious space.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>futures3 = e.compute(*values3)  <span class="hljs-comment"># only final results persist</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-48">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-48">&#182;</a>
+              </div>
+              <h1 id="dask-imperative-and-futures">Dask Imperative and Futures</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-49">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-49">&#182;</a>
+              </div>
+              <p>Dask imperative knows how to handle futures.  A common pattern is to persist
+input data in memory and then build complex computations off of these futures
+with dask imperative</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">&gt;&gt;&gt; </span>futures1 = e.map(load, filenames) <span class="hljs-comment"># base computations on persistent data</span>
+
+<span class="hljs-meta">&gt;&gt;&gt; </span>values2 = [do(process)(future) <span class="hljs-keyword">for</span> future <span class="hljs-keyword">in</span> futures1]  <span class="hljs-comment"># complex work</span>
+<span class="hljs-meta">&gt;&gt;&gt; </span>values3 = [do(store)(val2) <span class="hljs-keyword">for</span> val2 <span class="hljs-keyword">in</span> values2]         <span class="hljs-comment"># more work</span>
+
+<span class="hljs-meta">&gt;&gt;&gt; </span>futures3 = e.compute(*values3)  <span class="hljs-comment"># Trigger execution, persist result in</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-50">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-50">&#182;</a>
+              </div>
+              <p>The more computation we give to the scheduler at once, the smarter it can
+schedule our work.</p>
+
+            </div>
             
         </li>
         
