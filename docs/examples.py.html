@@ -62,12 +62,12 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>Set up a center on one node</p>
+              <p>Set up a scheduler on one node</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>$ dcenter     <span class="hljs-comment"># Use the below address to refer to the cluster</span>
-Start center at <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">8787</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>$ dscheduler     <span class="hljs-comment"># Use the below address to refer to the cluster</span>
+Start schedulerat <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">8786</span></pre></div></div>
             
         </li>
         
@@ -85,13 +85,13 @@ other machines and real addresses if desired.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>$ dworker <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">8787</span>
+            <div class="content"><div class='highlight'><pre>$ dworker <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">8786</span>
 Start worker at             <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">46990</span>
-Registered <span class="hljs-keyword">with</span> center at:  <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">8787</span>
+Registered <span class="hljs-keyword">with</span> scheduler at:  <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">8786</span>
 
-$ dworker <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">8787</span>
+$ dworker <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">8786</span>
 Start worker at             <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">38618</span>
-Registered <span class="hljs-keyword">with</span> center at:  <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">8787</span></pre></div></div>
+Registered <span class="hljs-keyword">with</span> scheduler at:  <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">8786</span></pre></div></div>
             
         </li>
         
@@ -115,12 +115,12 @@ Registered <span class="hljs-keyword">with</span> center at:  <span class="hljs-
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>Connect an executor to the center node of the cluster</p>
+              <p>Connect an executor to the scheduler node of the cluster</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">from</span> distributed <span class="hljs-keyword">import</span> Executor
-e = Executor(<span class="hljs-string">'127.0.0.1:8787'</span>)</pre></div></div>
+e = Executor(<span class="hljs-string">'127.0.0.1:8786'</span>)</pre></div></div>
             
         </li>
         
