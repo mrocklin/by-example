@@ -11,7 +11,7 @@ Setup
 Set up a scheduler on one node
 
     $ dscheduler     # Use the below address to refer to the cluster
-    Start schedulerat 127.0.0.1:8786
+    Start scheduler at 127.0.0.1:8786
 
 Set up workers on other processes or computers that point to this address
 
@@ -21,11 +21,11 @@ other machines and real addresses if desired.
 `distributed` communicates over TCP sockets.
 
     $ dworker 127.0.0.1:8786
-    Start worker at             127.0.0.1:46990
+    Start worker at                127.0.0.1:46990
     Registered with scheduler at:  127.0.0.1:8786
 
     $ dworker 127.0.0.1:8786
-    Start worker at             127.0.0.1:38618
+    Start worker at                127.0.0.1:38618
     Registered with scheduler at:  127.0.0.1:8786
 
 
